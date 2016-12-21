@@ -17,7 +17,7 @@ def check(matches):
 	"""
 	given iterators over the hypernet sequences and over the supernet sequences, determine whether any ABA in a supernet seq has a BAB in a hypernet seq
 	"""
-	# get ABAs from all match_objs in supernet sequences (maybe one at a time, could use the iterator returned by filter) and check if any ABA has a BAB in the hypernet seqs
+	# get ABAs from all match_objs in supernet sequences and check if any ABA has a BAB in the hypernet seqs
 	for abas in check_supernet(matches[0]):
 		for aba in abas:
 			if has_bab(aba, matches[1]):
@@ -32,7 +32,7 @@ def check_supernet(seq_list):
 	"""
 	given list of the supernet sequences, find the abas of each sequence
 	"""
-	return map(get_abas, seq_list) # change has_abba to be a method that returns ABAs from the match_obj
+	return map(get_abas, seq_list)
 
 # -------
 # has_bab
