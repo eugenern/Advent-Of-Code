@@ -39,7 +39,7 @@ elevator(F,T+1) :- elevator(F,T), not move(_,_,T), T=0..h-1.
 % (requires the implementation of assoc'ing generators w/ chips by element)
 
 % goal
-:- not on(X,bank2,h), item(X).
-:- not elevator(bank2,h).
+:- not on(X,F,h), item(X), loc(F), final(F).
+:- not elevator(F,h), loc(F), final(F) .
 
 #show move/3.

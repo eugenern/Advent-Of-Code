@@ -15,16 +15,17 @@ from element_symbols_dict import element_symbols
 # parse
 # -----
 
-def parse(line, writer):
+def parse(line, prev, writer):
 	"""
 	each line will contain information about which floor its describing and what objects are on that floor initially
 	parse the line to form more clingo-friendly facts
 	"""
-	# NOTE: eventually want to have some way to indicate the order of the floors, like an 'above' predicate or something
-	# ALSO: have to be able to associate generators with their matching microchips
+	# NOTE: have to be able to associate generators with their matching microchips
 	words = line.split()
 	floor = words[1]
 	writer.write('loc(' + floor + ').\n')
+	if prev:
+		writer.write('above(' + floor + ', ' + prev + ').\n')
 	for i in range(2, len(words)):
 		if 'generator' in words[i]:
 			item = element_symbols[words[i - 1]] + 'G'
@@ -34,6 +35,7 @@ def parse(line, writer):
 			item = element_symbols[words[i - 1].replace('-compatible', '')] + 'M'
 			writer.write('microchip(' + item + ').\n')
 			writer.write('on(' + item + ', ' + floor + ', 0).\n')
+	return floor
 
 # ----------
 # form_input
@@ -44,10 +46,12 @@ def form_input(reader, writer):
 	reader a reader
 	writer a writer
 	"""
+	prev = ''
 	for line in reader:
-		parse(line, writer)
+		prev = parse(line, prev, writer)
+	writer.write('final(' + prev + ').\n')
 	# assuming the first floor is always called 'first', the elevator will always start out on 'first'
-	writer.write('elevator(first, 0).')
+	writer.write('elevator(first, 0).\n')
 
 # ----
 # main
