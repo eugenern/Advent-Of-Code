@@ -20,21 +20,21 @@ def parse(line, prev, writer):
 	each line will contain information about which floor its describing and what objects are on that floor initially
 	parse the line to form more clingo-friendly facts
 	"""
-	# NOTE: have to be able to associate generators with their matching microchips
 	words = line.split()
 	floor = words[1]
 	writer.write('loc(' + floor + ').\n')
 	if prev:
-		writer.write('above(' + floor + ', ' + prev + ').\n')
+		writer.write('above(' + floor + ',' + prev + ').\n')
 	for i in range(2, len(words)):
 		if 'generator' in words[i]:
-			item = element_symbols[words[i - 1]] + 'G'
-			writer.write('generator(' + item + ').\n')
-			writer.write('on(' + item + ', ' + floor + ', 0).\n')
-		if 'microchip' in words[i]:
-			item = element_symbols[words[i - 1].replace('-compatible', '')] + 'M'
-			writer.write('microchip(' + item + ').\n')
-			writer.write('on(' + item + ', ' + floor + ', 0).\n')
+			symbol = element_symbols[words[i - 1]]
+			writer.write('generator(' + symbol + 'G).\n')
+			writer.write('on(' + symbol + 'G,' + floor + ',0).\n')
+		elif 'microchip' in words[i]:
+			symbol = element_symbols[words[i - 1].replace('-compatible', '')]
+			writer.write('microchip(' + symbol + 'M).\n')
+			writer.write('corresponds(' + symbol + 'M,' + symbol + 'G).\n')
+			writer.write('on(' + symbol + 'M,' + floor + ',0).\n')
 	return floor
 
 # ----------
@@ -49,9 +49,10 @@ def form_input(reader, writer):
 	prev = ''
 	for line in reader:
 		prev = parse(line, prev, writer)
-	writer.write('final(' + prev + ').\n')
+	# didn't use next line b/c sacrificing flexibility for much-needed efficiency
+	# writer.write('final(' + prev + ').\n')
 	# assuming the first floor is always called 'first', the elevator will always start out on 'first'
-	writer.write('elevator(first, 0).\n')
+	writer.write('elevator(first,0).\n')
 
 # ----
 # main
