@@ -29,7 +29,6 @@ elevator(Dest,T+1) :- move(_,down,T), elevator(Src,T), above(Src,Dest).
 :- move(_,down,T), elevator(first,T).
 
 % Impossible to be on multiple floors at the same time
-:- on(X,F1,T), on(X,F2,T), F1 != F2.
 :- elevator(F1,T), elevator(F2,T), F1 != F2.
 
 % inertia
