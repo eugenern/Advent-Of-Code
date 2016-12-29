@@ -115,4 +115,7 @@ element_symbols = {"hydrogen": "h",
 "moscovium": "mc",
 "livermorium": "lv",
 "tennessine": "ts",
-"oganesson": "og"}
+"oganesson": "og",
+# fictional elements
+"elerium": "el",
+"dilithium": "dt"}

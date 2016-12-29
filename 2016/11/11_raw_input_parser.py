@@ -22,7 +22,7 @@ def parse(line, prev, writer):
 	"""
 	words = line.split()
 	floor = words[1]
-	writer.write('loc(' + floor + ').\n')
+	#writer.write('loc(' + floor + ').\n')
 	if prev:
 		writer.write('above(' + floor + ',' + prev + ').\n')
 	for i in range(2, len(words)):

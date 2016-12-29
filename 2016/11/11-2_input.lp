@@ -1,10 +1,18 @@
-loc(first).
 generator(pmG).
 on(pmG,first,0).
 microchip(pmM).
 corresponds(pmM,pmG).
 on(pmM,first,0).
-loc(second).
+generator(elG).
+on(elG,first,0).
+microchip(elM).
+corresponds(elM,elG).
+on(elM,first,0).
+generator(dtG).
+on(dtG,first,0).
+microchip(dtM).
+corresponds(dtM,dtG).
+on(dtM,first,0).
 above(second,first).
 generator(coG).
 on(coG,second,0).
@@ -14,7 +22,6 @@ generator(ruG).
 on(ruG,second,0).
 generator(puG).
 on(puG,second,0).
-loc(third).
 above(third,second).
 microchip(coM).
 corresponds(coM,coG).
@@ -28,6 +35,5 @@ on(ruM,third,0).
 microchip(puM).
 corresponds(puM,puG).
 on(puM,third,0).
-loc(fourth).
 above(fourth,third).
 elevator(first,0).
