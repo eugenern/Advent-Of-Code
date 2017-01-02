@@ -41,4 +41,7 @@ elevator(F,T+1) :- elevator(F,T), not move(_,_,T), T=0..h-1.
 % goal -- again, hardcoded in final floor for efficiency
 :- not on(X,fourth,h), item(X).
 
+last(Time) :- Time = #max { T : move(_,_,T) }.
+#minimize { T : last(T) } .
+
 #show move/3.
