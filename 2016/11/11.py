@@ -27,7 +27,7 @@ def run(state, elevator, all_states, w):
 	"""
 	recursively search through possible moves to find a way to get all items to top
 	"""
-	w.write(str(state) + '\n')
+	# w.write(str(state) + '\n')
 	# base case: all microchips and generators are on the final floor
 	if all(item in state[-1] for pair in correspondings.items() for item in pair):
 		return 0

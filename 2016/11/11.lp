@@ -1,5 +1,5 @@
 % horizon -- adjust this for different inputs
-%#const h=40.
+#const h=59.
 
 % floors, items, and initial conditions should be defined in the input file
 
@@ -13,7 +13,7 @@ direction(down).
 % Choice rule for actions move(X,Dir,T): moves a item X or two items in the elevator up or down between times T and T+1.
 { move(X,Dir,T) : item(X), direction(Dir) } 2 :- T = 0..h-1.
 
-:- move(X,_,T), on(X,F,T), elevator(FF,T), F != FF.
+:- move(X,_,T), elevator(F,T), not on(X,F,T).
 
 % on(X,F,T): the item X is on floor F at time T
 % elevator(F,T): the elevator is on floor F at time T
@@ -36,12 +36,13 @@ on(X,F,T+1) :- on(X,F,T), not move(X,_,T), T=0..h-1.
 elevator(F,T+1) :- elevator(F,T), not move(_,_,T), T=0..h-1.
 
 % test to make sure that items don't irradiate each other
-:- on(M1,F1,T), on(G2,F1,T), microchip(M1), generator(G2), corresponds(M1,G1), G1 != G2, not on(G1,F1,T).
+:- on(M1,F,T), on(G2,F,T), generator(G2), corresponds(M1,G1), G1 != G2, not on(G1,F,T).
 
 % goal -- again, hardcoded in final floor for efficiency
 :- not on(X,fourth,h), item(X).
 
-last(Time) :- Time = #max { T : move(_,_,T) }.
-#minimize { T : last(T) } .
+% optimization
+% last(Time) :- Time = #max { T : move(_,_,T) }.
+% #minimize { T : last(T) }.
 
 #show move/3.
