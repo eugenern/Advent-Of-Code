@@ -18,7 +18,7 @@ from bisect import insort
 # -----------
 
 correspondings = {}
-HORIZON = 33 # user specified number of moves to try to match or beat
+HORIZON = 11 # user specified number of moves to try to match or beat
 
 # ---
 # run
@@ -30,10 +30,11 @@ def run(state, elevator, all_states, w, level):
 	"""
 	w.write(str(state) + ' ' + str(level) + '\n')
 	# base case: all microchips and generators are on the final floor
-	if all(item in state[-1] for pair in correspondings.items() for item in pair):
+	if len(state[-1]) == len(correspondings) * 2:
 		return level
 
-	if level >= HORIZON:
+	# if the stack is too deep or it's clearly impossible to move all first floor items in time, return 0 to indicate dead end
+	if level == HORIZON or state[0] and level + (len(state) - 1) * (2 * max(2, len(state[0])) - (len(state) - 1)) > HORIZON:
 		return 0
 	best = 0 # ok as an original value because best will never be zero if the base case wasn't met
 	# gather results of all possible paths and return the best one
@@ -76,9 +77,7 @@ def run(state, elevator, all_states, w, level):
 					best = temp
 				if temp and temp <= HORIZON:
 					return temp
-	# check if any moves worked out -- if best is still 0, this path of moves is no good
-	# if not best:
-	# 	return -1 # hacky way to communicate to the previous state that this move was bad
+	# if best is still 0, this path of moves is no good and the return value will indicate this
 	return best
 
 # ---------
