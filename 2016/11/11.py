@@ -18,56 +18,67 @@ from bisect import insort
 # -----------
 
 correspondings = {}
+HORIZON = 33 # user specified number of moves to try to match or beat
 
 # ---
 # run
 # ---
 
-def run(state, elevator, all_states, w):
+def run(state, elevator, all_states, w, level):
 	"""
 	recursively search through possible moves to find a way to get all items to top
 	"""
-	# w.write(str(state) + '\n')
+	w.write(str(state) + ' ' + str(level) + '\n')
 	# base case: all microchips and generators are on the final floor
 	if all(item in state[-1] for pair in correspondings.items() for item in pair):
-		return 0
+		return level
 
+	if level >= HORIZON:
+		return 0
 	best = 0 # ok as an original value because best will never be zero if the base case wasn't met
 	# gather results of all possible paths and return the best one
 	# iterate over all combinations of 1 or 2 items to move, try both up and down
 	for item_1 in state[elevator]:
-		# first, moving that item alone
-		if elevator != 0: # must be above first floor to move down
-			next_state = new_state(state, elevator, -1, item_1)
-			if not fried(next_state) and next_state not in all_states:
-				temp = 1 + run(next_state, elevator - 1, all_states + [next_state], w)
-				if (temp < best or not best) and temp:
-					best = temp
-		if elevator != len(state) - 1: # must be below top floor to move up
-			next_state = new_state(state, elevator, 1, item_1)
-			if not fried(next_state) and next_state not in all_states:
-				temp = 1 + run(next_state, elevator + 1, all_states + [next_state], w)
-				if (temp < best or not best) and temp:
-					best = temp
-		# next, try moving two items; avoid repeating pairs tried
+		# first, try moving two items; avoid repeating pairs tried
 		position = state[elevator].index(item_1)
 		for item_2 in state[elevator][(position + 1):]:
 			# same as above, try moving up and down
-			if elevator != 0: # must be above first floor to move down
-				next_state = new_state(state, elevator, -1, item_1, item_2)
-				if not fried(next_state) and next_state not in all_states:
-					temp = 1 + run(next_state, elevator - 1, all_states + [next_state], w)
-					if (temp < best or not best) and temp:
-						best = temp
 			if elevator != len(state) - 1: # must be below top floor to move up
 				next_state = new_state(state, elevator, 1, item_1, item_2)
 				if not fried(next_state) and next_state not in all_states:
-					temp = 1 + run(next_state, elevator + 1, all_states + [next_state], w)
+					temp = run(next_state, elevator + 1, all_states + [next_state], w, level + 1)
 					if (temp < best or not best) and temp:
 						best = temp
+					if temp and temp <= HORIZON:
+						return temp
+			if elevator != 0: # must be above first floor to move down
+				next_state = new_state(state, elevator, -1, item_1, item_2)
+				if not fried(next_state) and next_state not in all_states:
+					temp = run(next_state, elevator - 1, all_states + [next_state], w, level + 1)
+					if (temp < best or not best) and temp:
+						best = temp
+					if temp and temp <= HORIZON:
+						return temp
+		# next, moving that item alone
+		if elevator != len(state) - 1: # must be below top floor to move up
+			next_state = new_state(state, elevator, 1, item_1)
+			if not fried(next_state) and next_state not in all_states:
+				temp = run(next_state, elevator + 1, all_states + [next_state], w, level + 1)
+				if (temp < best or not best) and temp:
+					best = temp
+				if temp and temp <= HORIZON:
+					return temp
+		if elevator != 0: # must be above first floor to move down
+			next_state = new_state(state, elevator, -1, item_1)
+			if not fried(next_state) and next_state not in all_states:
+				temp = run(next_state, elevator - 1, all_states + [next_state], w, level + 1)
+				if (temp < best or not best) and temp:
+					best = temp
+				if temp and temp <= HORIZON:
+					return temp
 	# check if any moves worked out -- if best is still 0, this path of moves is no good
-	if not best:
-		return -1 # hacky way to communicate to the previous state that this move was bad
+	# if not best:
+	# 	return -1 # hacky way to communicate to the previous state that this move was bad
 	return best
 
 # ---------
@@ -128,10 +139,10 @@ def solve(reader, writer):
 	writer a writer
 	"""
 	initial = []
-	elevator = 2
+	elevator = 0
 	for line in reader:
 		initial.append(read(line))
-	out = str(run(initial, elevator, [initial], writer))
+	out = str(run(initial, elevator, [initial], writer, 0))
 	writer.write(out)
 
 # ----
