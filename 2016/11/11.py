@@ -37,11 +37,11 @@ def run(state, elevator, all_states, w, level):
 		return level
 
 	# if it's clearly impossible to move all first floor items in time or the stack is already too deep, return 0 to indicate dead end
-	if state[0] and level + (len(state) - 1) * (2 * max(2, len(state[0])) - (len(state) - 1)) > HORIZON or level == HORIZON:
+	if state[0] and level + elevator + (len(state) - 1) * (2 * max(2, len(state[0])) - (len(state) - 1)) > HORIZON or level == HORIZON:
 		# store level and state in bad_states
 		bad_states[level].append(state)
 		return 0
-	best = 0 # ok as an original value because best will never be zero if the base case wasn't met
+	# best = 0 # ok as an original value because best will never be zero if the base case wasn't met
 	# gather results of all possible paths and return the best one
 	# iterate over all combinations of 1 or 2 items to move, try both up and down
 	for item_1 in state[elevator]:
@@ -53,16 +53,16 @@ def run(state, elevator, all_states, w, level):
 				next_state = new_state(state, elevator, 1, item_1, item_2)
 				if not fried(next_state) and next_state not in all_states and all(next_state not in bad_states[i] for i in range(2, level + 2)):
 					temp = run(next_state, elevator + 1, all_states + [next_state], w, level + 1)
-					if (temp < best or not best) and temp:
-						best = temp
+					# if (temp < best or not best) and temp:
+						# best = temp
 					if temp and temp <= HORIZON:
 						return temp
 			if elevator != 0: # must be above first floor to move down
 				next_state = new_state(state, elevator, -1, item_1, item_2)
 				if not fried(next_state) and next_state not in all_states and all(next_state not in bad_states[i] for i in range(2, level + 2)):
 					temp = run(next_state, elevator - 1, all_states + [next_state], w, level + 1)
-					if (temp < best or not best) and temp:
-						best = temp
+					# if (temp < best or not best) and temp:
+						# best = temp
 					if temp and temp <= HORIZON:
 						return temp
 		# next, moving that item alone
@@ -70,23 +70,24 @@ def run(state, elevator, all_states, w, level):
 			next_state = new_state(state, elevator, 1, item_1)
 			if not fried(next_state) and next_state not in all_states and all(next_state not in bad_states[i] for i in range(2, level + 2)):
 				temp = run(next_state, elevator + 1, all_states + [next_state], w, level + 1)
-				if (temp < best or not best) and temp:
-					best = temp
+				# if (temp < best or not best) and temp:
+					# best = temp
 				if temp and temp <= HORIZON:
 					return temp
 		if elevator != 0: # must be above first floor to move down
 			next_state = new_state(state, elevator, -1, item_1)
 			if not fried(next_state) and next_state not in all_states and all(next_state not in bad_states[i] for i in range(2, level + 2)):
 				temp = run(next_state, elevator - 1, all_states + [next_state], w, level + 1)
-				if (temp < best or not best) and temp:
-					best = temp
+				# if (temp < best or not best) and temp:
+					# best = temp
 				if temp and temp <= HORIZON:
 					return temp
 	# if best is still 0, this path of moves is no good and the return value will indicate this
-	if not best and level > 1:
-		# store level and state in bad_states
-		bad_states[level].append(state)
-	return best
+	# if not best and level > 1:
+	# 	# store level and state in bad_states
+	# 	bad_states[level].append(state)
+	# return best
+	return 0
 
 # ---------
 # new_state
@@ -145,10 +146,8 @@ def solve(reader, writer):
 	reader a reader
 	writer a writer
 	"""
-	initial = []
+	initial = tuple(read(line) for line in reader)
 	elevator = 0
-	for line in reader:
-		initial.append(read(line))
 	out = run(initial, elevator, [initial], writer, 0)
 	writer.write(str(out) if out else 'Either unsatisfiable or all items are already on top floor')
 
