@@ -17,9 +17,9 @@ from itertools import combinations
 # -----------
 
 correspondings = {}
-HORIZON = 11 # user specified number of moves to try to match or beat
+HORIZON = 33 # user specified number of moves to try to match or beat
 # at floor f and stack level s, all states in bad_states[f][s] are known to be bad paths
-bad_states = tuple(tuple(set() for i in range(12)) for j in range(4)) # unfortunately hardcoding in number of floors here
+bad_states = tuple(tuple(set() for i in range(HORIZON + 1)) for j in range(4)) # unfortunately hardcoding in number of floors here
 
 # ---
 # run
@@ -29,7 +29,7 @@ def run(state, elevator, all_states, w, level):
 	"""
 	recursively search through possible moves to find a way to get all items to top
 	"""
-	w.write(str(state) + ' ' + str(level) + '\n')
+	w.write(str(state) + ' ' + str(elevator) + ' ' + str(level) + '\n')
 	# base case: all microchips and generators are on the final floor
 	if len(state[-1]) == len(correspondings) * 2: # another possibility: not any(state[:-1]); is it faster? could also allow elimination of correspondings dict
 		return level
@@ -46,7 +46,7 @@ def run(state, elevator, all_states, w, level):
 	for item_1, item_2 in combinations(state[elevator], 2):
 		if elevator != len(state) - 1: # must be below top floor to move up
 			next_state = new_state(state, elevator, 1, {item_1, item_2})
-			if not fried(next_state) and next_state not in all_states[elevator + 1] and all(next_state not in bs for bs in bad_states[elevator][2:level + 2]):
+			if not fried(next_state) and next_state not in all_states[elevator + 1] and all(next_state not in bs for bs in bad_states[elevator + 1][2:level + 2]):
 				temp = run(next_state, elevator + 1, all_states[:elevator + 1] + (all_states[elevator + 1] | {next_state},) + all_states[elevator + 2:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
@@ -54,7 +54,7 @@ def run(state, elevator, all_states, w, level):
 					return temp
 		if elevator != 0: # must be above first floor to move down
 			next_state = new_state(state, elevator, -1, {item_1, item_2})
-			if not fried(next_state) and next_state not in all_states[elevator - 1] and all(next_state not in bs for bs in bad_states[elevator][2:level + 2]):
+			if not fried(next_state) and next_state not in all_states[elevator - 1] and all(next_state not in bs for bs in bad_states[elevator - 1][2:level + 2]):
 				temp = run(next_state, elevator - 1, all_states[:elevator - 1] + (all_states[elevator - 1] | {next_state},) + all_states[elevator:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
@@ -64,7 +64,7 @@ def run(state, elevator, all_states, w, level):
 	for item_1 in state[elevator]:
 		if elevator != len(state) - 1: # must be below top floor to move up
 			next_state = new_state(state, elevator, 1, {item_1})
-			if not fried(next_state) and next_state not in all_states[elevator + 1] and all(next_state not in bs for bs in bad_states[elevator][2:level + 2]):
+			if not fried(next_state) and next_state not in all_states[elevator + 1] and all(next_state not in bs for bs in bad_states[elevator + 1][2:level + 2]):
 				temp = run(next_state, elevator + 1, all_states[:elevator + 1] + (all_states[elevator + 1] | {next_state},) + all_states[elevator + 2:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
@@ -72,7 +72,7 @@ def run(state, elevator, all_states, w, level):
 					return temp
 		if elevator != 0: # must be above first floor to move down
 			next_state = new_state(state, elevator, -1, {item_1})
-			if not fried(next_state) and next_state not in all_states[elevator - 1] and all(next_state not in bs for bs in bad_states[elevator][2:level + 2]):
+			if not fried(next_state) and next_state not in all_states[elevator - 1] and all(next_state not in bs for bs in bad_states[elevator - 1][2:level + 2]):
 				temp = run(next_state, elevator - 1, all_states[:elevator - 1] + (all_states[elevator - 1] | {next_state},) + all_states[elevator:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
