@@ -18,9 +18,8 @@ from itertools import combinations
 
 correspondings = {}
 HORIZON = 11 # user specified number of moves to try to match or beat
-# at stack level x, all states in bad_states[x] are known to be bad paths
-# don't need entries for levels 0 or 1 because a state on those levels will never be reconsidered
-bad_states = {i: set() for i in range(HORIZON + 1)} # should it be a dictionary or tuple?
+# at floor f and stack level s, all states in bad_states[f][s] are known to be bad paths
+bad_states = tuple(tuple(set() for i in range(12)) for j in range(4)) # unfortunately hardcoding in number of floors here
 
 # ---
 # run
@@ -38,43 +37,43 @@ def run(state, elevator, all_states, w, level):
 	# if it's clearly impossible to move all first floor items in time or the stack is already too deep, return 0 to indicate dead end
 	if state[0] and level + elevator + (len(state) - 1) * (2 * max(2, len(state[0])) - (len(state) - 1)) > HORIZON or level == HORIZON:
 		# store level and state in bad_states
-		bad_states[level].add(state)
+		bad_states[elevator][level].add(state)
 		return 0
 	# best = 0 # ok as an original value because best will never be zero if the base case wasn't met
 	# gather results of all possible paths and return the best one
 	# iterate over all combinations of 1 or 2 items to move, try both up and down
-	# first, try moving two items; avoid repeating pairs tried
+	# first, try moving two items; use itertools.combinations() to avoid repeating pairs tried
 	for item_1, item_2 in combinations(state[elevator], 2):
 		if elevator != len(state) - 1: # must be below top floor to move up
 			next_state = new_state(state, elevator, 1, {item_1, item_2})
-			if not fried(next_state) and next_state not in all_states and all(next_state not in bad_states[i] for i in range(2, level + 2)):
-				temp = run(next_state, elevator + 1, all_states | {next_state}, w, level + 1)
+			if not fried(next_state) and next_state not in all_states[elevator + 1] and all(next_state not in bs for bs in bad_states[elevator][2:level + 2]):
+				temp = run(next_state, elevator + 1, all_states[:elevator + 1] + (all_states[elevator + 1] | {next_state},) + all_states[elevator + 2:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
 				if temp and temp <= HORIZON:
 					return temp
 		if elevator != 0: # must be above first floor to move down
 			next_state = new_state(state, elevator, -1, {item_1, item_2})
-			if not fried(next_state) and next_state not in all_states and all(next_state not in bad_states[i] for i in range(2, level + 2)):
-				temp = run(next_state, elevator - 1, all_states | {next_state}, w, level + 1)
+			if not fried(next_state) and next_state not in all_states[elevator - 1] and all(next_state not in bs for bs in bad_states[elevator][2:level + 2]):
+				temp = run(next_state, elevator - 1, all_states[:elevator - 1] + (all_states[elevator - 1] | {next_state},) + all_states[elevator:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
 				if temp and temp <= HORIZON:
 					return temp
+	# next, moving that item alone
 	for item_1 in state[elevator]:
-		# next, moving that item alone
 		if elevator != len(state) - 1: # must be below top floor to move up
 			next_state = new_state(state, elevator, 1, {item_1})
-			if not fried(next_state) and next_state not in all_states and all(next_state not in bad_states[i] for i in range(2, level + 2)):
-				temp = run(next_state, elevator + 1, all_states | {next_state}, w, level + 1)
+			if not fried(next_state) and next_state not in all_states[elevator + 1] and all(next_state not in bs for bs in bad_states[elevator][2:level + 2]):
+				temp = run(next_state, elevator + 1, all_states[:elevator + 1] + (all_states[elevator + 1] | {next_state},) + all_states[elevator + 2:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
 				if temp and temp <= HORIZON:
 					return temp
 		if elevator != 0: # must be above first floor to move down
 			next_state = new_state(state, elevator, -1, {item_1})
-			if not fried(next_state) and next_state not in all_states and all(next_state not in bad_states[i] for i in range(2, level + 2)):
-				temp = run(next_state, elevator - 1, all_states | {next_state}, w, level + 1)
+			if not fried(next_state) and next_state not in all_states[elevator - 1] and all(next_state not in bs for bs in bad_states[elevator][2:level + 2]):
+				temp = run(next_state, elevator - 1, all_states[:elevator - 1] + (all_states[elevator - 1] | {next_state},) + all_states[elevator:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
 				if temp and temp <= HORIZON:
@@ -82,9 +81,9 @@ def run(state, elevator, all_states, w, level):
 	# if best is still 0, this path of moves is no good and the return value will indicate this
 	# if not best and level > 1:
 	# 	# store level and state in bad_states
-	# 	bad_states[level].add(state)
+	# 	bad_states[elevator][level].add(state)
 	# return best
-	bad_states[level].add(state)
+	bad_states[elevator][level].add(state)
 	return 0
 
 # ---------
@@ -95,7 +94,8 @@ def new_state(state, elevator, direction, items):
 	"""
 	return the state of the floors given items to move and direction to move in (expressed as the value of new floor - current floor)
 	"""
-	return tuple(state[i] if i != elevator and i != elevator + direction else state[i] ^ items for i in range(len(state)))
+	# sacrificed flexibility for speed: only works w/ directions 1 and -1
+	return state[:elevator + (direction - 1) // 2] + (state[elevator + (direction - 1) // 2] ^ items, state[elevator + (direction + 1) // 2] ^ items) + state[elevator + (direction + 3) // 2:]
 
 # -----
 # fried
@@ -136,7 +136,7 @@ def solve(reader, writer):
 	"""
 	initial = tuple(frozenset(read(line)) for line in reader)
 	elevator = 0
-	out = run(initial, elevator, {initial}, writer, 0)
+	out = run(initial, elevator, (frozenset(),) * elevator + (frozenset(initial),) + (frozenset(),) * (len(initial) - elevator - 1), writer, 0)
 	writer.write(str(out) if out else 'Either unsatisfiable or all items are already on top floor')
 
 # ----
