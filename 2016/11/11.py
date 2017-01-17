@@ -35,7 +35,7 @@ def run(state, elevator, all_states, w, level):
 		return level
 
 	# if it's clearly impossible to move all first floor items in time or the stack is already too deep, return 0 to indicate dead end
-	if state[0] and level + elevator + (len(state) - 1) * (2 * max(2, len(state[0])) - (len(state) - 1)) > HORIZON or level == HORIZON:
+	if state[0] and level + elevator + (len(state) - 1) * (2 * max(2, len(state[0])) - 3) > HORIZON or level == HORIZON:
 		# store level and state in bad_states
 		bad_states[elevator][level].add(state)
 		return 0
@@ -52,7 +52,7 @@ def run(state, elevator, all_states, w, level):
 					# best = temp
 				if temp and temp <= HORIZON:
 					return temp
-		if elevator != 0: # must be above first floor to move down
+		if elevator != 0 and level + len(state) - elevator + 1 <= HORIZON: # must be above first floor and not cause a clearly invalid situation to move down
 			next_state = new_state(state, elevator, -1, {item_1, item_2})
 			if not fried(next_state) and next_state not in all_states[elevator - 1] and all(next_state not in bs for bs in bad_states[elevator - 1][2:level + 2]):
 				temp = run(next_state, elevator - 1, all_states[:elevator - 1] + (all_states[elevator - 1] | {next_state},) + all_states[elevator:], w, level + 1)
@@ -70,7 +70,7 @@ def run(state, elevator, all_states, w, level):
 					# best = temp
 				if temp and temp <= HORIZON:
 					return temp
-		if elevator != 0: # must be above first floor to move down
+		if elevator != 0 and level + len(state) - elevator + 1 <= HORIZON: # must be above first floor and not cause a clearly invalid situation to move down
 			next_state = new_state(state, elevator, -1, {item_1})
 			if not fried(next_state) and next_state not in all_states[elevator - 1] and all(next_state not in bs for bs in bad_states[elevator - 1][2:level + 2]):
 				temp = run(next_state, elevator - 1, all_states[:elevator - 1] + (all_states[elevator - 1] | {next_state},) + all_states[elevator:], w, level + 1)
