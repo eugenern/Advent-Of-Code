@@ -10,7 +10,7 @@ Given a description of the locations of the generators and the microchips, find 
 
 import sys
 from element_symbols_dict import element_symbols
-from itertools import combinations
+from itertools import combinations, accumulate
 
 # -----------
 # global vars
@@ -31,11 +31,12 @@ def run(state, elevator, all_states, w, level):
 	"""
 	w.write(str(state) + ' ' + str(elevator) + ' ' + str(level) + '\n')
 	# base case: all microchips and generators are on the final floor
-	if len(state[-1]) == len(correspondings) * 2: # another possibility: not any(state[:-1]); is it faster? could also allow elimination of correspondings dict
+	if len(state[-1]) == len(correspondings) * 2: # another possibility: not any(state[:-1]); could allow elimination of correspondings dict
 		return level
 
 	# if it's clearly impossible to move all first floor items in time or the stack is already too deep, return 0 to indicate dead end
-	if state[0] and level + elevator + (len(state) - 1) * (2 * max(2, len(state[0])) - 3) > HORIZON or level == HORIZON:
+	lowest = next(i for i,v in enumerate(state) if v)
+	if level + elevator - lowest + sum(i * 2 - 3 if i > 1 else i for i in accumulate(len(v) + (1 if not j else 0) + (-1 if j == elevator - lowest else 0) for j, v in enumerate(state[lowest:-1]))) > HORIZON:
 		# store level and state in bad_states
 		bad_states[elevator][level].add(state)
 		return 0
