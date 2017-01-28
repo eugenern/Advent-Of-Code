@@ -51,7 +51,7 @@ def run(state, elevator, all_states, w, level):
 				temp = run(next_state, elevator + 1, all_states[:elevator + 1] + (all_states[elevator + 1] | {next_state},) + all_states[elevator + 2:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
-				if temp and temp <= HORIZON:
+				if temp:
 					return temp
 		if elevator != 0 and level + len(state) - elevator + 1 <= HORIZON: # must be above first floor and not cause a clearly invalid situation to move down
 			next_state = new_state(state, elevator, -1, {item_1, item_2})
@@ -59,7 +59,7 @@ def run(state, elevator, all_states, w, level):
 				temp = run(next_state, elevator - 1, all_states[:elevator - 1] + (all_states[elevator - 1] | {next_state},) + all_states[elevator:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
-				if temp and temp <= HORIZON:
+				if temp:
 					return temp
 	# next, moving that item alone
 	for item_1 in state[elevator]:
@@ -69,7 +69,7 @@ def run(state, elevator, all_states, w, level):
 				temp = run(next_state, elevator + 1, all_states[:elevator + 1] + (all_states[elevator + 1] | {next_state},) + all_states[elevator + 2:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
-				if temp and temp <= HORIZON:
+				if temp:
 					return temp
 		if elevator != 0 and level + len(state) - elevator + 1 <= HORIZON: # must be above first floor and not cause a clearly invalid situation to move down
 			next_state = new_state(state, elevator, -1, {item_1})
@@ -77,7 +77,7 @@ def run(state, elevator, all_states, w, level):
 				temp = run(next_state, elevator - 1, all_states[:elevator - 1] + (all_states[elevator - 1] | {next_state},) + all_states[elevator:], w, level + 1)
 				# if (temp < best or not best) and temp:
 					# best = temp
-				if temp and temp <= HORIZON:
+				if temp:
 					return temp
 	# if best is still 0, this path of moves is no good and the return value will indicate this
 	# if not best and level > 1:
