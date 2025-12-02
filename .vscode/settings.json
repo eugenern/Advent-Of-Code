@@ -1,0 +1,6 @@
+{
+    "editor.insertSpaces": true,
+    "[python]": {
+        "prettier.tabWidth": 4
+    }
+}
