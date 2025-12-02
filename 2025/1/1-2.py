@@ -1,6 +1,6 @@
 """
 Given instructions of the format [RL]\\d+ and a dial with positions 0-99 starting at 50,
-determine how many times while running through the instructions the dial points to 0
+determine how many times while running through the instructions the dial passes through 0
 """
 
 # -------
