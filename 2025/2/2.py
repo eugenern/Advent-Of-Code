@@ -22,8 +22,9 @@ def find_invalids_in_range(lo, hi):
         for j in range(2, num_digits + 1):
             if not num_digits % j and \
                 all(
-                    i_str[ : num_digits // j] == i_str[k * num_digits // j : (k + 1) * num_digits // j] \
-                        for k in range(1, j)
+                    i_str[ : num_digits // j] == \
+                        i_str[k * num_digits // j : (k + 1) * num_digits // j] \
+                            for k in range(1, j)
                 ):
                 yield i
                 break

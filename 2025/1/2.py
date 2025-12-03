@@ -29,7 +29,8 @@ def calculate_pass_through_0(cur_pos, direction, steps):
     # if dir = L: steps 0-89 no pass through; 90+ has initial pass through;
     # 90-189 has only one pass through; 190+ has excess pass throughs
     # therefore, if R, calc using max(0, steps - 10); if L calc using max(0, steps - 90)
-    excess_pass_throughs = (max(0, steps - ((100 - cur_pos) if direction == 'R' else cur_pos))) // 100
+    excess_pass_throughs = \
+        (max(0, steps - ((100 - cur_pos) if direction == 'R' else cur_pos))) // 100
     return initial_pass_through + excess_pass_throughs
 
 # -------------
