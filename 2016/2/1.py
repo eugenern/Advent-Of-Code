@@ -17,25 +17,15 @@ def move_to_button(button, moves):
     get next button given previous button and movements
     """
     for m in moves:
-        if m == "U" and button > 3:
+        if m == 'U' and button > 3:
             button -= 3
-        elif m == "D" and button < 7:
+        elif m == 'D' and button < 7:
             button += 3
-        elif m == "L" and button % 3 != 1:
+        elif m == 'L' and button % 3 != 1:
             button -= 1
-        elif m == "R" and button % 3 != 0:
+        elif m == 'R' and button % 3 != 0:
             button += 1
     return button
-
-# ----
-# read
-# ----
-
-def read(string):
-    """
-    get movements to next button
-    """
-    return [string[n:n+1] for n in range(len(string))]
 
 # -----
 # solve
@@ -48,8 +38,7 @@ def solve(reader, writer):
     """
     button = 5
     for line in reader:
-        moves = read(line)
-        button = move_to_button(button, moves)
+        button = move_to_button(button, line)
         writer.write(str(button))
 
 # ----

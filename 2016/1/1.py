@@ -17,9 +17,9 @@ def update_pos(state, turn, num):
     """
     update state based on turn and num
     """
-    if turn == "R":
+    if turn == 'R':
         state[0] = (state[0] + 1) % 4
-    elif turn == "L":
+    elif turn == 'L':
         state[0] = (state[0] - 1) % 4
 
     if state[0] % 2: # going E or W
@@ -37,7 +37,7 @@ def read(string):
     """
     get direction and number of steps
     """
-    return [string[:1], int(string[1:])]
+    return string[0], int(string[1:])
 
 # -----
 # solve
@@ -50,7 +50,7 @@ def solve(reader, writer):
     """
     for line in reader:
         state = [0, 0, 0] # facing (0=N, 1=E, 2=S, 3=W), units S, units E
-        for instruction in line.split(", "):
+        for instruction in line.split(', '):
             turn, num = read(instruction)
             state = update_pos(state, turn, num)
         writer.write(str(abs(state[1]) + abs(state[2])))
