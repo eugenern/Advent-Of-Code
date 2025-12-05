@@ -18,27 +18,27 @@ def check(iters):
     given iterators over the hypernet sequences and over the other parts,
     determine whether ABBAs are placed appropriately
     """
-    return check_hypernet(iters[0]) and check_other(iters[1])
+    return check_hypernets(iters[0]) and check_others(iters[1])
 
-# --------------
-# check_hypernet
-# --------------
+# ---------------
+# check_hypernets
+# ---------------
 
-def check_hypernet(seq_iter):
+def check_hypernets(seq_iter):
     """
     given iterator over the hypernet sequences, check that there are no ABBAs
     """
-    return not any(filter(has_abba, seq_iter))
+    return not any(map(has_abba, seq_iter))
 
-# -----------
-# check_other
-# -----------
+# ------------
+# check_others
+# ------------
 
-def check_other(seq_iter):
+def check_others(seq_iter):
     """
     given iterator over the other parts, check that there is at least one ABBA
     """
-    return any(filter(has_abba, seq_iter))
+    return any(map(has_abba, seq_iter))
 
 # --------
 # has_abba
@@ -48,15 +48,9 @@ def has_abba(match_obj):
     """
     given a match object, determine whether the matched sequence contains an ABBA
     """
-    seq = match_obj.group(0)
-    return any(map(lambda x: seq[x] != seq[x + 1]
-                   and seq[x + 1] == seq[x + 2]
-                   and seq[x] == seq[x + 3],
-                   range(len(seq) - 3))) # faster because lazy
-    # return list(filter(lambda x: seq[x] != seq[x + 1]
-                        # and seq[x + 1] == seq[x + 2]
-                        # and seq[x] == seq[x + 3],
-                        # range(len(seq) - 3)))
+    seq = match_obj.group()
+    return any(map(lambda x: seq[x] != seq[x + 1] and seq[x : x + 2] == seq[x + 3 : x + 1 : -1],
+                   range(len(seq) - 3)))
 
 # ----
 # read
@@ -66,6 +60,7 @@ def read(string):
     """
     get iterators for the hypernet sequences and the supernet sequences from the IP address
     """
+    # note: supernet pattern assumes that there exists at least one hypernet
     return (re.finditer(r'(?<=\[)[a-z]+(?=\])', string),
             re.finditer(r'(?<=\])[a-z]+|[a-z]+(?=\[)', string))
 
@@ -78,9 +73,7 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-    # writer.write(str(len([line for line in reader if check(read(line))])))
-    # this seems to be the faster option
-    writer.write(str(len(list(filter(lambda line: check(read(line)), reader)))))
+    writer.write(str(len(list(filter(check, map(read, reader))))))
 
 # ----
 # main

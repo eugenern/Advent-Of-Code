@@ -13,57 +13,56 @@ import re
 # check
 # -----
 
-def check(matches):
+def check(iters):
     """
     given iterators over the hypernet sequences and over the supernet sequences,
     determine whether any ABA in a supernet seq has a BAB in a hypernet seq
     """
-    # get ABAs from all match_objs in supernet sequences
-    # and check if any ABA has a BAB in the hypernet seqs
-    for abas in check_supernet(matches[0]):
-        for aba in abas:
-            if has_bab(aba, matches[1]):
-                return True
-    return False
+    # gather all ABAs from all match_objs in supernet sequences
+    # and then search through hypernets for sequence matching any BAB
+    abas = set(aba for seq_abas in check_supernets(iters[1]) for aba in seq_abas)
+    babs = set(aba[1] + aba[0] + aba[1] for aba in abas)
+    return abas and check_hypernets(iters[0], babs)
 
-# --------------
-# check_supernet
-# --------------
+# ---------------
+# check_supernets
+# ---------------
 
-def check_supernet(seq_list):
+def check_supernets(seq_iter):
     """
-    given list of the supernet sequences, find the abas of each sequence
+    given iterator over the supernet sequences, find the abas of each sequence
     """
-    return map(get_abas, seq_list)
+    return map(get_abas, seq_iter)
 
-# -------
-# has_bab
-# -------
+# ---------------
+# check_hypernets
+# ---------------
 
-def has_bab(aba, seq_list):
+def check_hypernets(seq_iter, babs):
     """
-    given aba and list of hypernet sequences, check if a corresponding bab exists
+    given iterator over the hypernet sequences, check that there is at least one BAB
     """
-    for seq in seq_list:
-        if any(map(
-            lambda x: seq[x] == aba[1] == seq[x + 2]
-            and seq[x + 1] == aba[0],
-            range(len(seq) - 2))):
-            return True
-    return False
+    # don't know how to avoid calling match.group() multiple times
+    # and tbh, the commented code may be more readable than the one-liner
+    return any(match.group()[i : i + 3] in babs
+               for match in seq_iter for i in range(len(match.group()) - 2))
+    # for match in seq_iter:
+    #     seq = match.group()
+    #     for i in range(len(seq) - 2):
+    #         if seq[i : i + 3] in babs:
+    #             return True
+    # return False
 
 # --------
 # get_abas
 # --------
 
-def get_abas(seq):
+def get_abas(match_obj):
     """
     given a sequence, find all abas
     """
-    return map(
-        lambda x: seq[x:x+3],
-        filter(lambda x: seq[x] != seq[x + 1] and seq[x] == seq[x + 2], range(len(seq) - 2))
-        )
+    seq = match_obj.group()
+    return (seq[i : i + 3] for i in range(len(seq) - 2) if seq[i] == seq[i + 2] != seq[i + 1])
 
 # ----
 # read
@@ -73,9 +72,8 @@ def read(string):
     """
     get iterators for the hypernet sequences and the supernet sequences from the IP address
     """
-    # can use an iterator for one of them? but need the whole list of strings for the other
-    return (re.findall(r'(?<=\[)[a-z]+(?=\])', string),
-            re.findall(r'(?<=\])[a-z]+|[a-z]+(?=\[)', string))
+    return (re.finditer(r'(?<=\[)[a-z]+(?=\])', string),
+            re.finditer(r'(?<=\])[a-z]+|[a-z]+(?=\[)', string))
 
 # -----
 # solve
@@ -86,7 +84,7 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-    writer.write(str(len([line for line in reader if check(read(line))])))
+    writer.write(str(len(list(filter(check, map(read, reader))))))
 
 # ----
 # main
