@@ -22,7 +22,7 @@ def check(name, checksum):
         if c in all_letters:
             all_letters[c] += 1
         else:
-            all_letters[c] = 0
+            all_letters[c] = 1
     count = 0
     for letter_freq in \
         sorted(sorted(all_letters.items(), key=lambda x: x[0]), key=lambda x: x[1], reverse=True):
@@ -31,6 +31,8 @@ def check(name, checksum):
         if count == 4:
             return True
         count += 1
+
+    return False
 
 # ----
 # read
@@ -54,10 +56,7 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-    # calling read() 3 times inefficient, oh well
-    writer.write(str(
-        sum([read(line)[1] for line in reader if check(read(line)[0], read(line)[2])])
-        ))
+    writer.write(str(sum(id for (name, id, chksum) in map(read, reader) if check(name, chksum))))
 
 # ----
 # main

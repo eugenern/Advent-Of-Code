@@ -16,13 +16,13 @@ def most_freq(column):
     """
     find the value with the highest frequency in the tuple
     """
-
-    max_count = 0
-    for char in set(column):
-        if column.count(char) > max_count:
-            real_char = char
-            max_count = column.count(char)
-    return real_char
+    letter_freqs = {}
+    letter_found = column[0]
+    for c in column:
+        letter_freqs[c] = letter_freqs.get(c, 0) + 1
+        if letter_freqs[c] > letter_freqs[letter_found]:
+            letter_found = c
+    return letter_found
 
 # -----
 # solve
@@ -33,13 +33,7 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-
-    message = ''
-    messages = [line for line in reader]
-    for column in zip(*messages):
-        next_char = most_freq(column)
-        message += next_char
-    writer.write(message)
+    writer.write(''.join(map(most_freq, zip(*reader))))
 
 # ----
 # main

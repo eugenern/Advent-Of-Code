@@ -9,37 +9,13 @@ Given a list of rooms, find the sector ID of the room that stores North Pole obj
 import sys
 import re
 
-# -----
-# check
-# -----
-
-def check(name, checksum):
-    """
-    given a room name and the checksum, check whether the room is real
-    """
-    name = re.sub('-', '', name)
-    all_letters = {}
-    for c in name:
-        if c in all_letters:
-            all_letters[c] += 1
-        else:
-            all_letters[c] = 0
-    count = 0
-    for letter_freq in \
-        sorted(sorted(all_letters.items(), key=lambda x: x[0]), key=lambda x: x[1], reverse=True):
-        if letter_freq[0] != checksum[count]:
-            return False
-        if count == 4:
-            return True
-        count += 1
-
 # -------
 # decrypt
 # -------
 
 def decrypt(name, sector_id):
     """
-    given the encrypted room name and sector id, decrypt the name
+    given the encrypted room name and sector id, decrypt the name according to shift cipher
     """
     name = re.sub('-', ' ', name)
     rotation = sector_id % 26
@@ -53,11 +29,10 @@ def decrypt(name, sector_id):
 
 def read(string):
     """
-    get the name, sector id, and checksum from a room string
+    get the name and sector id from a room string
     """
     return (re.match(r'([a-z\-]+)-\d', string).group(1),
-            int(re.search('[0-9]+', string).group(0)),
-            re.search(r'\[([a-z]+)\]', string).group(1))
+            int(re.search('[0-9]+', string).group(0)))
 
 # -----
 # solve
@@ -68,14 +43,13 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-    # calling read() 5 times inefficient, oh well
-    writer.write(str(
-        [
-            read(line)[1] for line in reader
-            if 'northpole' in decrypt(read(line)[0], read(line)[1])
-            and check(read(line)[0], read(line)[2])
-        ]
-        ))
+    # note: the problem statement doesn't explicitly state
+    # that 'northpole' should be in the real name;
+    # without that info, solution would require listing out all real names
+    # (optionally filtering out decoy rooms) and manually inspecting them
+    writer.write(str(next(
+        id for (name, id) in map(read, reader) if 'northpole' in decrypt(name, id)
+        )))
 
 # ----
 # main

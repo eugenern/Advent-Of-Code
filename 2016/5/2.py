@@ -8,7 +8,7 @@ according to the algorithm described on the AoC website
 # -------
 
 import sys
-import hashlib
+from hashlib import md5
 
 # -------------
 # find_password
@@ -22,13 +22,9 @@ def find_password(door_id):
     password = '--------'
 
     while '-' in password:
-        m = hashlib.md5((door_id + str(index)).encode())
-        hex_rep = m.hexdigest()
-        if all(map(lambda x: x == '0', hex_rep[:5])) \
-            and int(hex_rep[5], 16) < 8 \
-                and password[int(hex_rep[5])] == '-':
-            pos = int(hex_rep[5])
-            password = password[:pos] + hex_rep[6] + password[pos + 1:]
+        m = md5((door_id + str(index)).encode()).hexdigest()
+        if all(c == '0' for c in m[:5]) and (pos := int(m[5], 16)) < 8 and password[pos] == '-':
+            password = password[:pos] + m[6] + password[pos + 1:]
         index += 1
 
     return password

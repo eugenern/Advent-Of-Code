@@ -43,7 +43,7 @@ def solve(reader, writer):
 
     # triple groups every 3 lines together
     for triple in zip(all_sides[::3], all_sides[1::3], all_sides[2::3]):
-        # then we take each of the 3 lines and zip their elements together by index in line
+        # then we unpack the 3 lines and zip their elements together by index in line
         count += len(list(filter(triangle_possible, zip(*triple))))
     writer.write(str(count))
 

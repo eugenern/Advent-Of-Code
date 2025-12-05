@@ -16,13 +16,11 @@ def least_freq(column):
     """
     find the value with the lowest frequency in the tuple
     """
+    letter_freqs = {}
+    for c in column:
+        letter_freqs[c] = letter_freqs.get(c, 0) + 1
 
-    min_count = len(column)
-    for char in set(column):
-        if column.count(char) < min_count:
-            real_char = char
-            min_count = column.count(char)
-    return real_char
+    return sorted(letter_freqs.items(), key=lambda x: x[1])[0][0]
 
 # -----
 # solve
@@ -33,13 +31,7 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-
-    message = ''
-    messages = [line for line in reader]
-    for column in zip(*messages):
-        next_char = least_freq(column)
-        message += next_char
-    writer.write(message)
+    writer.write(''.join(map(least_freq, zip(*reader))))
 
 # ----
 # main
