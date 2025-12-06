@@ -34,7 +34,7 @@ def solve(reader, writer):
     """
     terms = list(map(read, reader))
 
-    writer.write(str(sum(sum(op[:-1]) if op[-1] == '+' else prod(op[:-1]) for op in zip(*terms))))
+    writer.write(str(sum((sum if op[-1] == '+' else prod)(op[:-1]) for op in zip(*terms))))
 
 # ----
 # main
