@@ -76,7 +76,10 @@ def solve(reader, writer):
         else:
             rotate(*instr)
 
-    writer.write(str(sum(map(lambda x: x.count(True), screen))))
+    # writer.write(str(sum(map(lambda x: x.count(True), screen))))
+    # writer.write(str(sum(sum(1 if pixel else 0 for pixel in row) for row in screen)))
+    # writer.write(str(sum(sum(map(int, row)) for row in screen)))
+    writer.write(str(sum(row.count(True) for row in screen)))
 
 # ----
 # main

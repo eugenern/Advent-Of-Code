@@ -68,9 +68,8 @@ def print_letters():
     """
     print out the screen's display
     """
-    for i in range(len(screen)):
-        disp = ['#' if x else '.' for x in screen[i]]
-        print(*disp, sep='')
+    for row in screen:
+        print(*('#' if pixel else '.' for pixel in row), sep='')
 
 # -----
 # solve
