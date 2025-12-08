@@ -31,21 +31,19 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-    splits = 0
-    beams = read(reader.readline())
+    beams = dict.fromkeys(read(reader.readline()), 1)
     for line in reader:
         splitters = read(line)
-        new_beams = set()
-        for beam in beams:
+        new_beams = {}
+        for beam, timelines in beams.items():
             if beam in splitters:
-                new_beams.add(beam - 1)
-                new_beams.add(beam + 1)
-                splits += 1
+                new_beams[beam - 1] = new_beams.get(beam - 1, 0) + timelines
+                new_beams[beam + 1] = new_beams.get(beam + 1, 0) + timelines
             else:
-                new_beams.add(beam)
+                new_beams[beam] = new_beams.get(beam, 0) + timelines
         beams = new_beams
 
-    writer.write(str(splits))
+    writer.write(str(sum(beams.values())))
 
 # ----
 # main
