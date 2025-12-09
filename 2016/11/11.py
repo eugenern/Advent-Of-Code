@@ -1,5 +1,6 @@
 """
-Given a description of the locations of the generators and the microchips, find the minimum number of steps to move all items to the top
+Given a description of the locations of the generators and the microchips,
+find the minimum number of steps to move all items to the top
 """
 
 #!/usr/bin/env python3
@@ -145,4 +146,4 @@ def solve(reader, writer):
 # ----
 
 if __name__ == "__main__":
-	solve(sys.stdin, sys.stdout)
+    solve(sys.stdin, sys.stdout)
