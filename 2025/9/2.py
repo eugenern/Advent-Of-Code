@@ -29,7 +29,7 @@ from itertools import combinations
 
 def read(string):
     """
-    get
+    get coordinates of red tile
     """
     return tuple(map(int, string.split(',')))
 
