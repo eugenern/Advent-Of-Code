@@ -1,3 +1,7 @@
+"""
+Use graphviz to create a visualization of devices and their outputs
+"""
+
 import sys
 import graphviz
 
@@ -17,7 +21,7 @@ if __name__ == "__main__":
     flows = dict(map(read, sys.stdin))
     dot = graphviz.Digraph()
     for key in flows:
-        color = 'orange' if key == 'fft' or key == 'dac' else 'white'
+        color = 'orange' if key in {'fft', 'dac'} else 'white'
         dot.node(key, fillcolor=color, style='filled')
 
     for key, val in flows.items():
