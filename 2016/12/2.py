@@ -11,11 +11,10 @@ determine what the value in register a will be after the code finishes execution
 
 import sys
 
-# ----------------
-# registers and pc
-# ----------------
+# ---------
+# registers
+# ---------
 
-pc = 0
 regs = {'a': 0, 'b': 0, 'c': 1, 'd': 0}
 
 # ----
@@ -26,7 +25,7 @@ def copy(val, reg):
     """
     given either an int or a reg and a reg, copy the val of the first arg to the second arg
     """
-    regs[reg] = int(val) if val < 'a' else regs[val] # super hacky I know
+    regs[reg] = int(val) if val.isdecimal() else regs[val]
 
 # ---
 # inc
@@ -52,15 +51,16 @@ def dec(reg):
 # jnz
 # ---
 
-def jnz(val, offset):
+def jnz(val, offset, pc):
     """
     given either an int or a reg and a offset,
     if the value of the first arg is not zero, change pc by offset
     """
-    global pc
-    if (int(val) if val < 'a' else regs[val]) != 0: # same hack as in copy()
+    if int(val) if val.isdecimal() else regs[val]:
         # hacky way to account for pc incrementing every time the loop iterates
         pc += int(offset) - 1
+
+    return pc
 
 # -----
 # solve
@@ -71,7 +71,7 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-    global pc
+    pc = 0
     code = list(reader)
     while pc < len(code):
         line = code[pc].split()
@@ -83,7 +83,7 @@ def solve(reader, writer):
         elif instr == 'dec':
             dec(line[1])
         elif instr == 'jnz':
-            jnz(line[1], line[2])
+            pc = jnz(line[1], line[2], pc)
 
         pc += 1
 
