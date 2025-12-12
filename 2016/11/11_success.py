@@ -21,9 +21,12 @@ def create_next_state(state, elevator_change, items):
     """
     Given a state, how many floors to move up/down, and items to move, return the new state
     """
-    # update item positions
-    # add elevator_change, increment steps
-    return state
+    floors_items, elevator, steps = state
+    new_elevator = elevator + elevator_change
+    new_floors_items = tuple(floor_items ^ items if floor in {elevator, new_elevator}
+                             else floor_items
+                             for floor, floor_items in enumerate(floors_items))
+    return (new_floors_items, new_elevator, steps + 1)
 
 # --------------
 # is state fried
@@ -97,7 +100,7 @@ def read(string):
 # solve
 # -----
 
-def solve(reader, writer):
+def solve(reader):
     """
     reader a reader
     writer a writer
@@ -119,19 +122,20 @@ def solve(reader, writer):
         visited.add(comparable)
 
         if is_complete(floors_items):
-            writer.write(str(steps))
+            print(steps)
             break
 
         # add possible next states to fringe: combos of 2 items up/down, single item up/down
-        for items in chain(combinations(floors_items[elevator], r) for r in range(1, 3)):
-            elevator_changes = \
-                ([1] if elevator < len(floors_items) - 1 else []) + ([-1] if elevator else [])
-            for elevator_change in elevator_changes:
-                fringe.append(create_next_state(cur_state, elevator_change, items))
+        for items_sizes in chain(combinations(floors_items[elevator], r) for r in range(1, 3)):
+            for items in items_sizes:
+                elevator_changes = \
+                    ([1] if elevator < len(floors_items) - 1 else []) + ([-1] if elevator else [])
+                for elevator_change in elevator_changes:
+                    fringe.append(create_next_state(cur_state, elevator_change, frozenset(items)))
 
 # ----
 # main
 # ----
 
 if __name__ == "__main__":
-    solve(sys.stdin, sys.stdout)
+    solve(sys.stdin)
