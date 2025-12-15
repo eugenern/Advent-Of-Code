@@ -11,7 +11,7 @@ reached within 50 steps from (1,1)
 
 def solve(fav_num, max_steps, grid_dim):
     """
-    create the office map and search for a path to goal
+    create the office map and track locations while exploring
     """
     # True means wall, False means open space
     grid = [
