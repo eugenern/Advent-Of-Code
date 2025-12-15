@@ -1,5 +1,5 @@
 """
-Given directions to traverse grid, how many houses get visited
+Given directions to traverse grid, count how many houses get visited
 """
 
 # -------
@@ -17,21 +17,15 @@ def count_houses(directions):
     iterate through directions and track how many houses get visited
     """
     # format of coord: x, y
-    visited = set()
-    santa_cur_house = (0, 0)
-    robo_cur_house = (0, 0)
-    visited.add(santa_cur_house)
-    santas_turn = True
+    cur_houses = [(0, 0), (0, 0)]
+    visited = {cur_houses[0],}
+    who_goes = 0
     for direction in directions:
         x_move = 1 if direction == '>' else -1 if direction == '<' else 0
         y_move = 1 if direction == '^' else -1 if direction == 'v' else 0
-        if santas_turn:
-            santa_cur_house = (santa_cur_house[0] + x_move, santa_cur_house[1] + y_move)
-            visited.add(santa_cur_house)
-        else:
-            robo_cur_house = (robo_cur_house[0] + x_move, robo_cur_house[1] + y_move)
-            visited.add(robo_cur_house)
-        santas_turn = not santas_turn
+        cur_houses[who_goes] = (cur_houses[who_goes][0] + x_move, cur_houses[who_goes][1] + y_move)
+        visited.add(cur_houses[who_goes])
+        who_goes = int(not who_goes)
 
     return len(visited)
 

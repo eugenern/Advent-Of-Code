@@ -15,7 +15,7 @@ def solve(fav_num, goal, grid_dim):
     """
     # True means wall, False means open space
     grid = [
-        [bool(bin(x*x + 3*x + 2*x*y + y + y*y + fav_num).count('1') % 2)
+        [bool((x*x + 3*x + 2*x*y + y + y*y + fav_num).bit_count() % 2)
          for x in range(grid_dim)]
         for y in range(grid_dim)]
 

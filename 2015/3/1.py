@@ -1,5 +1,5 @@
 """
-Given directions to traverse grid, how many houses get visited
+Given directions to traverse grid, count how many houses get visited
 """
 
 # -------

@@ -17,14 +17,14 @@ def is_nice(string):
     given a string, determine whether it is considered nice
     """
     vowel_count = 0
-    vowel_set = set(('a', 'e', 'i', 'o', 'u'))
+    vowel_set = {'a', 'e', 'i', 'o', 'u'}
     double = False
-    forbidden = set(('ab', 'cd', 'pq', 'xy'))
+    forbidden = {'ab', 'cd', 'pq', 'xy'}
     for i, c in enumerate(string):
-        if c in vowel_set:
+        if vowel_count < 3 and c in vowel_set:
             vowel_count += 1
         if i < len(string) - 1:
-            if c == string[i + 1]:
+            if not double and c == string[i + 1]:
                 double = True
             if c + string[i + 1] in forbidden:
                 return False
@@ -40,7 +40,7 @@ def solve(reader, writer):
     reader a reader
     writer a writer
     """
-    writer.write(str(len([line for line in reader if is_nice(line.rstrip())])))
+    writer.write(str(sum(map(is_nice, map(str.rstrip, reader)))))
 
 # ----
 # main

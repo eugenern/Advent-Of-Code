@@ -16,8 +16,8 @@ def calculate_area_and_slack(ln, wd, ht):
     """
     calculate surface area of rect prism + extra slack area
     """
-    sa = 2 * (ln * wd + ln * ht + wd * ht)
-    slack = min(ln * wd, ln * ht, wd * ht)
+    sa = 2 * ((lw := ln * wd) + (lh := ln * ht) + (wh := wd * ht))
+    slack = min(lw, lh, wh)
     return sa + slack
 
 # ----
