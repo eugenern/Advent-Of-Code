@@ -119,12 +119,11 @@ def solve(reader):
             break
 
         # add possible next states to fringe: combos of 2 items up/down, single item up/down
-        for items_sizes in chain(combinations(floors_items[elevator], r) for r in range(1, 3)):
-            for items in items_sizes:
-                elevator_changes = \
-                    ([1] if elevator < len(floors_items) - 1 else []) + ([-1] if elevator else [])
-                for elevator_change in elevator_changes:
-                    fringe.append(create_next_state(cur_state, elevator_change, frozenset(items)))
+        for items in chain.from_iterable(combinations(floors_items[elevator], r) for r in range(1, 3)):
+            elevator_changes = \
+                ([1] if elevator < len(floors_items) - 1 else []) + ([-1] if elevator else [])
+            for elevator_change in elevator_changes:
+                fringe.append(create_next_state(cur_state, elevator_change, frozenset(items)))
 
 # ----
 # main

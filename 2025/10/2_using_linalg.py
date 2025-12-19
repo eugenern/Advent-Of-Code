@@ -29,8 +29,8 @@ def configure(machine):
     num_buttons = len(buttons)
     matrix = [[0] * num_buttons for _ in range(len(jolts))]
     for i, button in enumerate(buttons):
-        for to_inc in button:
-            matrix[to_inc][i] = 1
+        for to_increment in button:
+            matrix[to_increment][i] = 1
 
     # syms_list = list(chr(97 + i) for i in range(num_buttons))
     # syms = symbols(' '.join(syms_list))
