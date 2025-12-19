@@ -1,10 +1,7 @@
 """
-Start over after failed attempt in 2016.
 Given a description of the locations of the generators and the microchips,
 find the minimum number of steps to move all items to the top
 """
-
-#!/usr/bin/env python3
 
 # -------
 # imports
@@ -51,23 +48,21 @@ def convert_to_comparable(floors_items, elevator):
     convert it to a structure that's functionally equivalent
     """
     # keep elevator position and make an unordered collection of (m-floor, g-floor) for each element
-    # maybe a dict to map (m-floor, g-floor) values to frequency in state
-    # first, create a dict mapping elements to location tuple
-    # then create a dict mapping location tuples to frequencies and return it w/ elevator position
-    # hmm, but i want result to be hashable. use frozenset?
+    # use a dict to map (m-floor, g-floor) values to frequency in state
+    # create a dict mapping elements to (m-floor, g-floor) and another dict tracking frequencies of
+    # (m-floor, g-floor) values and return it w/ elevator position
+    # i want result to be hashable, so use frozenset of (m-floor, g-floor) frequency tuples
     elems_to_locs = {}
+    locs_to_freqs = {}
     for i, floor in enumerate(floors_items):
         for item in floor:
             elem, item_type = item[:-1], item[-1]
             if elem in elems_to_locs:
                 elems_to_locs[elem][0 if item_type == 'm' else 1] = i
+                tuple_loc = tuple(elems_to_locs[elem])
+                locs_to_freqs[tuple_loc] = locs_to_freqs.get(tuple_loc, 0) + 1
             else:
                 elems_to_locs[elem] = [i, -1] if item_type == 'm' else [-1, i]
-
-    locs_to_freqs = {}
-    for loc in elems_to_locs.values():
-        tuple_loc = tuple(loc)
-        locs_to_freqs[tuple_loc] = locs_to_freqs.get(tuple_loc, 0) + 1
 
     return (frozenset(locs_to_freqs.items()), elevator)
 
@@ -89,12 +84,10 @@ def read(string):
     """
     Given a description of what items are on this floor, return a tuple of items
     """
-    items = []
-    for i, word in enumerate(words := string.split()):
-        if 'microchip' in word or 'generator' in word:
-            items.append(words[i - 1].replace('-compatible', '') + word[0])
-
-    return frozenset(items)
+    words = string.split()
+    return frozenset(words[i - 1].replace('-compatible', '') + word[0]
+                     for i, word in enumerate(words)
+                     if 'microchip' in word or 'generator' in word)
 
 # -----
 # solve
@@ -106,7 +99,7 @@ def solve(reader):
     writer a writer
     """
     # format of state: (items on each floor) + elevator position + steps taken so far
-    state = (tuple(map(read, reader)),) + (0, 0)
+    state = (tuple(map(read, reader)), 0, 0)
     visited = set()
     fringe = [state]
     while fringe:
