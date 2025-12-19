@@ -1,9 +1,6 @@
 """
 Given indicator light diagrams, button wiring schematics, and joltage requirements,
 calculate the fewest total button presses required to initialize all machines
-
-NOTE: may want to redo this as BFS isn't necessary -- just go through all combinations of all sizes
-of pressing buttons once each
 """
 
 # -------
@@ -24,12 +21,12 @@ def initialize(machine):
     req_lights, buttons = machine
     initial_lights = (False,) * len(req_lights)
 
-    # format of state: current lights, presses made
-    initial_state = (initial_lights, 0)
+    # format of state: current lights, buttons already pressed, presses made
+    initial_state = (initial_lights, set(), 0)
     visited = set()
     fringe = [initial_state]
     while fringe:
-        lights, presses = fringe[0]
+        lights, already_pressed, presses = fringe[0]
         del fringe[0]
 
         if lights in visited:
@@ -40,12 +37,12 @@ def initialize(machine):
         if lights == req_lights:
             return presses
 
-        for button in buttons:
+        for button in buttons - already_pressed:
             new_lights_list = list(lights)
             for to_toggle in button:
                 new_lights_list[to_toggle] = not new_lights_list[to_toggle]
             new_lights = tuple(new_lights_list)
-            fringe.append((new_lights, presses + 1))
+            fringe.append((new_lights, already_pressed | {button}, presses + 1))
 
     return -1
 
@@ -59,7 +56,7 @@ def read(string):
     """
     lights_str, buttons_strs = (machine := string.split())[0], machine[1:-1]
     lights = tuple(c == '#' for c in lights_str[1:-1])
-    buttons = tuple(tuple(map(int, buttons_str[1:-1].split(','))) for buttons_str in buttons_strs)
+    buttons = set(tuple(map(int, buttons_str[1:-1].split(','))) for buttons_str in buttons_strs)
     return lights, buttons
 
 # -----
