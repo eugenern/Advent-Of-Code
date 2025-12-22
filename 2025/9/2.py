@@ -46,14 +46,12 @@ def solve(reader):
     """
     reader a reader
     """
-    # NOTE: to index into grid, first provide y-val (which row) then x-val (which col)
     reds = list(map(read, reader))
     all_red_x, all_red_y = map(set, zip(*reds))
     for corners in sorted(combinations(reds, 2), key=calc_area, reverse=True):
-        lo_x, lo_y, hi_x, hi_y = min(corners[0][0], corners[1][0]), \
-                                 min(corners[0][1], corners[1][1]), \
-                                 max(corners[0][0], corners[1][0]), \
-                                 max(corners[0][1], corners[1][1])
+        lo_x, lo_y, hi_x, hi_y = \
+            min(corners[0][0], corners[1][0]), min(corners[0][1], corners[1][1]), \
+            max(corners[0][0], corners[1][0]), max(corners[0][1], corners[1][1])
 
         # check all points from lo_x to hi_x @ lo_y & hi_y, and from lo_y to hi_y @ lo_x & hi_x
         all_inside = True
